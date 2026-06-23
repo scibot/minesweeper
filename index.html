@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minesweeper</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #1a1a2e;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 20px;
+    font-family: 'Segoe UI', sans-serif;
+    color: #eee;
+  }
+
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 16px;
+    color: #e94560;
+    text-shadow: 0 0 20px rgba(233,69,96,0.5);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+
+  /* Difficulty selector */
+  .difficulty-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .diff-btn {
+    padding: 6px 18px;
+    border: 2px solid #444;
+    background: #16213e;
+    color: #aaa;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+  }
+  .diff-btn.active, .diff-btn:hover {
+    border-color: #e94560;
+    color: #fff;
+    background: #e94560;
+  }
+
+  /* Panel */
+  .panel {
+    background: #16213e;
+    border: 2px solid #0f3460;
+    border-radius: 12px;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+
+  /* 7-segment style display */
+  .seg-display {
+    background: #000;
+    border: 2px solid #333;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: #ff3333;
+    min-width: 70px;
+    text-align: center;
+    letter-spacing: 3px;
+    text-shadow: 0 0 8px #ff3333;
+  }
+
+  /* Smiley button */
+  #reset-btn {
+    font-size: 1.8rem;
+    background: #f0c040;
+    border: 3px solid #c09000;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.1s;
+    line-height: 1;
+  }
+  #reset-btn:hover { transform: scale(1.1); }
+  #reset-btn:active { transform: scale(0.95); }
+
+  /* Game grid wrapper */
+  #game-wrapper {
+    overflow-x: auto;
+    max-width: 98vw;
+  }
+
+  #grid {
+    display: inline-grid;
+    gap: 2px;
+    background: #0f3460;
+    border: 3px solid #0f3460;
+    border-radius: 4px;
+    padding: 3px;
+    user-select: none;
+  }
+
+  .cell {
+    width: 32px;
+    height: 32px;
+    background: #2a4a7f;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    border: 2px solid #3a5a9f;
+    transition: background 0.05s;
+    position: relative;
+  }
+  .cell:hover:not(.revealed):not(.flagged) {
+    background: #3a5a9f;
+  }
+  .cell.revealed {
+    background: #1a2a4a;
+    border-color: #1a2a4a;
+    cursor: default;
+  }
+  .cell.flagged {
+    background: #2a4a7f;
+    border-color: #3a5a9f;
+  }
+  .cell.mine-hit {
+    background: #e94560 !important;
+    border-color: #c03040 !important;
+  }
+  .cell.mine-shown {
+    background: #1a2a4a;
+    border-color: #1a2a4a;
+  }
+
+  /* Number colors */
+  .n1 { color: #4fc3f7; }
+  .n2 { color: #81c784; }
+  .n3 { color: #ff8a65; }
+  .n4 { color: #ce93d8; }
+  .n5 { color: #ff5252; }
+  .n6 { color: #40e0d0; }
+  .n7 { color: #fff176; }
+  .n8 { color: #bdbdbd; }
+
+  /* Overlay */
+  #overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  #overlay.show { display: flex; }
+
+  .overlay-bg {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+  }
+
+  /* Animation containers */
+  #anim-container {
+    position: relative;
+    z-index: 1001;
+    width: 600px;
+    height: 340px;
+    max-width: 95vw;
+  }
+
+  /* Game over / win screen */
+  #result-screen {
+    display: none;
+    position: relative;
+    z-index: 1001;
+    background: #16213e;
+    border: 3px solid #e94560;
+    border-radius: 16px;
+    padding: 32px 48px;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(233,69,96,0.4);
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  #result-screen.show { display: flex; }
+
+  #result-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #e94560;
+  }
+  #result-title.win { color: #81c784; }
+
+  #result-stats {
+    font-size: 1rem;
+    color: #aaa;
+  }
+
+  .play-again-btn {
+    margin-top: 8px;
+    padding: 10px 30px;
+    background: #e94560;
+    border: none;
+    border-radius: 24px;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    font-weight: bold;
+    letter-spacing: 1px;
+    transition: background 0.2s;
+  }
+  .play-again-btn:hover { background: #c03040; }
+  .play-again-btn.win { background: #388e3c; }
+  .play-again-btn.win:hover { background: #2e7d32; }
+
+  /* ============= ANIMATION A: Fart Face ============= */
+  #anim-fart {
+    display: none;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    animation: fadeIn 0.3s ease;
+  }
+  #anim-fart.show { display: block; }
+
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+  /* Fart cloud flying */
+  @keyframes fartFly {
+    0% { transform: translateX(0) scaleX(1); opacity: 0; }
+    10% { opacity: 1; }
+    80% { transform: translateX(220px) scaleX(1.3); opacity: 1; }
+    100% { transform: translateX(240px) scaleX(1.4); opacity: 0.8; }
+  }
+
+  /* Kid B recoil */
+  @keyframes recoil {
+    0%,60% { transform: translateX(0) rotate(0); }
+    70% { transform: translateX(30px) rotate(8deg); }
+    80% { transform: translateX(25px) rotate(6deg); }
+    100% { transform: translateX(25px) rotate(6deg); }
+  }
+
+  /* Stink lines */
+  @keyframes stink {
+    0%, 60% { opacity: 0; }
+    70%, 90% { opacity: 1; }
+    100% { opacity: 0.8; }
+  }
+
+  /* Speech bubble pop */
+  @keyframes bubblePop {
+    0% { transform: scale(0); opacity: 0; }
+    50% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .fart-cloud {
+    animation: fartFly 2s ease-in forwards;
+    animation-delay: 0.5s;
+  }
+  .kid-b-group {
+    animation: recoil 3s ease forwards;
+  }
+  .stink-lines {
+    animation: stink 3s ease forwards;
+  }
+  .speech-bubble-fart {
+    animation: bubblePop 0.4s ease forwards;
+    animation-delay: 0.3s;
+    opacity: 0;
+    transform-origin: bottom center;
+  }
+
+  /* ============= ANIMATION B: Hammer Bonk ============= */
+  #anim-bonk {
+    display: none;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    animation: fadeIn 0.3s ease;
+  }
+  #anim-bonk.show { display: block; }
+
+  /* Hammer swing */
+  @keyframes hammerSwing {
+    0% { transform: rotate(-80deg) translateY(-20px); }
+    60% { transform: rotate(-80deg) translateY(-20px); }
+    80% { transform: rotate(30deg) translateY(10px); }
+    85% { transform: rotate(25deg); }
+    100% { transform: rotate(25deg); }
+  }
+
+  /* Bang starburst */
+  @keyframes bangAppear {
+    0%, 75% { transform: scale(0); opacity: 0; }
+    80% { transform: scale(1.3); opacity: 1; }
+    90% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* Dizzy stars orbit */
+  @keyframes orbitStar {
+    from { transform: rotate(0deg) translateX(30px) rotate(0deg); }
+    to { transform: rotate(360deg) translateX(30px) rotate(-360deg); }
+  }
+
+  /* Kid B bonk wobble */
+  @keyframes bonkWobble {
+    0%,75% { transform: translateY(0) rotate(0); }
+    80% { transform: translateY(-10px) rotate(-5deg); }
+    85% { transform: translateY(5px) rotate(3deg); }
+    90% { transform: translateY(-3px) rotate(-2deg); }
+    100% { transform: translateY(0) rotate(0); }
+  }
+
+  .hammer-group {
+    transform-origin: 80px 20px;
+    animation: hammerSwing 3s ease forwards;
+  }
+  .bang-burst {
+    animation: bangAppear 3s ease forwards;
+    transform-origin: center;
+  }
+  .dizzy-star {
+    animation: orbitStar 0.6s linear infinite;
+    animation-delay: 2.4s;
+  }
+  .dizzy-star:nth-child(2) { animation-delay: 2.6s; animation-duration: 0.7s; }
+  .dizzy-star:nth-child(3) { animation-delay: 2.5s; animation-duration: 0.8s; }
+  .bonk-kid-b {
+    animation: bonkWobble 3s ease forwards;
+  }
+  .speech-bubble-bonk {
+    animation: bubblePop 0.4s ease forwards;
+    animation-delay: 2.3s;
+    opacity: 0;
+    transform-origin: bottom left;
+  }
+
+  /* ============= Confetti ============= */
+  #confetti-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 999;
+    overflow: hidden;
+  }
+  .confetti-piece {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    top: -20px;
+    animation: confettiFall linear forwards;
+  }
+  @keyframes confettiFall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<h1>&#128163; Minesweeper</h1>
+
+<div class="difficulty-bar">
+  <button class="diff-btn active" data-diff="easy">Easy</button>
+  <button class="diff-btn" data-diff="medium">Medium</button>
+  <button class="diff-btn" data-diff="hard">Hard</button>
+</div>
+
+<div class="panel">
+  <div class="seg-display" id="mine-counter">010</div>
+  <button id="reset-btn" title="New game">&#128512;</button>
+  <div class="seg-display" id="timer">000</div>
+</div>
+
+<div id="game-wrapper">
+  <div id="grid"></div>
+</div>
+
+<!-- Overlay -->
+<div id="overlay">
+  <div class="overlay-bg"></div>
+
+  <!-- Animation container -->
+  <div id="anim-container">
+
+    <!-- FART FACE animation -->
+    <div id="anim-fart">
+      <svg width="100%" height="100%" viewBox="0 0 600 340" xmlns="http://www.w3.org/2000/svg">
+        <!-- Background -->
+        <rect width="600" height="340" fill="#ffe066" rx="16"/>
+        <text x="300" y="36" text-anchor="middle" font-size="28" font-weight="bold" fill="#c00" font-family="Arial Black, sans-serif">PFFFT!</text>
+
+        <!-- KID A (left, pants down) -->
+        <g transform="translate(80, 60)">
+          <!-- Body -->
+          <ellipse cx="40" cy="80" rx="22" ry="32" fill="#4fc3f7"/>
+          <!-- Head -->
+          <circle cx="40" cy="38" r="28" fill="#ffe0b2"/>
+          <!-- Eyes -->
+          <ellipse cx="32" cy="34" rx="4" ry="5" fill="#222"/>
+          <ellipse cx="48" cy="34" rx="4" ry="5" fill="#222"/>
+          <!-- Evil grin -->
+          <path d="M28 48 Q40 58 52 48" stroke="#c00" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <!-- Hair -->
+          <path d="M14 28 Q40 8 66 28" stroke="#8d6e63" stroke-width="6" fill="none"/>
+          <!-- Arms up -->
+          <line x1="18" y1="90" x2="-5" y2="65" stroke="#4fc3f7" stroke-width="8" stroke-linecap="round"/>
+          <line x1="62" y1="90" x2="85" y2="65" stroke="#4fc3f7" stroke-width="8" stroke-linecap="round"/>
+          <!-- Legs -->
+          <line x1="30" y1="112" x2="20" y2="155" stroke="#3a5a9f" stroke-width="9" stroke-linecap="round"/>
+          <line x1="50" y1="112" x2="60" y2="155" stroke="#3a5a9f" stroke-width="9" stroke-linecap="round"/>
+          <!-- Pants down (around ankles) -->
+          <rect x="10" y="148" width="60" height="16" rx="4" fill="#1a237e"/>
+          <!-- Bare butt region -->
+          <ellipse cx="40" cy="118" rx="24" ry="14" fill="#ffe0b2"/>
+          <!-- Butt crack hint -->
+          <path d="M40 106 Q40 122 40 130" stroke="#e0a060" stroke-width="2" fill="none"/>
+          <!-- Shoes -->
+          <ellipse cx="22" cy="162" rx="12" ry="6" fill="#333"/>
+          <ellipse cx="58" cy="162" rx="12" ry="6" fill="#333"/>
+        </g>
+
+        <!-- FART CLOUD -->
+        <g class="fart-cloud" transform="translate(155, 155)" opacity="0">
+          <!-- Green fart cloud blobs -->
+          <ellipse cx="30" cy="20" rx="30" ry="22" fill="#76c442" opacity="0.9"/>
+          <ellipse cx="60" cy="15" rx="25" ry="20" fill="#8bc34a" opacity="0.85"/>
+          <ellipse cx="85" cy="22" rx="22" ry="18" fill="#76c442" opacity="0.9"/>
+          <ellipse cx="50" cy="35" rx="35" ry="20" fill="#a5d63a" opacity="0.8"/>
+          <ellipse cx="30" cy="38" rx="18" ry="14" fill="#8bc34a" opacity="0.7"/>
+          <ellipse cx="80" cy="38" rx="16" ry="14" fill="#76c442" opacity="0.75"/>
+          <!-- wavy lines inside -->
+          <path d="M20 24 Q35 18 50 24 Q65 30 80 24" stroke="#5a9e30" stroke-width="2" fill="none" opacity="0.6"/>
+          <path d="M25 32 Q45 26 65 32 Q75 36 90 30" stroke="#5a9e30" stroke-width="2" fill="none" opacity="0.5"/>
+          <!-- Stink symbols -->
+          <text x="35" y="12" font-size="16" fill="#5a9e30" opacity="0.7">~</text>
+          <text x="65" y="10" font-size="14" fill="#5a9e30" opacity="0.6">~</text>
+        </g>
+
+        <!-- KID B (right, recoiling) -->
+        <g class="kid-b-group" transform="translate(390, 55)">
+          <!-- Body -->
+          <ellipse cx="40" cy="80" rx="22" ry="32" fill="#ff8a65"/>
+          <!-- Head -->
+          <circle cx="40" cy="38" r="28" fill="#ffe0b2"/>
+          <!-- Eyes - wide shocked X eyes -->
+          <line x1="28" y1="30" x2="36" y2="38" stroke="#222" stroke-width="3"/>
+          <line x1="36" y1="30" x2="28" y2="38" stroke="#222" stroke-width="3"/>
+          <line x1="44" y1="30" x2="52" y2="38" stroke="#222" stroke-width="3"/>
+          <line x1="52" y1="30" x2="44" y2="38" stroke="#222" stroke-width="3"/>
+          <!-- Disgusted open mouth -->
+          <ellipse cx="40" cy="52" rx="10" ry="7" fill="#c00"/>
+          <path d="M33 52 Q40 46 47 52" fill="#ff6060"/>
+          <!-- Hair -->
+          <path d="M14 28 Q40 8 66 28" stroke="#8d6e63" stroke-width="6" fill="none"/>
+          <!-- Arms flailing -->
+          <line x1="18" y1="85" x2="-10" y2="60" stroke="#ff8a65" stroke-width="8" stroke-linecap="round"/>
+          <line x1="62" y1="85" x2="90" y2="55" stroke="#ff8a65" stroke-width="8" stroke-linecap="round"/>
+          <!-- Legs -->
+          <line x1="30" y1="112" x2="22" y2="160" stroke="#1a237e" stroke-width="9" stroke-linecap="round"/>
+          <line x1="50" y1="112" x2="58" y2="160" stroke="#1a237e" stroke-width="9" stroke-linecap="round"/>
+          <!-- Shoes -->
+          <ellipse cx="24" cy="167" rx="12" ry="6" fill="#333"/>
+          <ellipse cx="56" cy="167" rx="12" ry="6" fill="#333"/>
+
+          <!-- Stink lines near face -->
+          <g class="stink-lines" opacity="0">
+            <line x1="-10" y1="20" x2="-30" y2="5" stroke="#5a9e30" stroke-width="3" stroke-linecap="round"/>
+            <line x1="-8" y1="35" x2="-32" y2="30" stroke="#5a9e30" stroke-width="3" stroke-linecap="round"/>
+            <line x1="-5" y1="50" x2="-28" y2="52" stroke="#5a9e30" stroke-width="3" stroke-linecap="round"/>
+            <text x="-40" y="10" font-size="20" fill="#5a9e30">&#128169;</text>
+          </g>
+        </g>
+
+        <!-- Speech bubble PFFFT -->
+        <g class="speech-bubble-fart" transform="translate(60,180)">
+          <ellipse cx="60" cy="30" rx="60" ry="28" fill="#fff" stroke="#333" stroke-width="3"/>
+          <polygon points="60,58 75,72 85,58" fill="#fff" stroke="#333" stroke-width="3"/>
+          <text x="60" y="37" text-anchor="middle" font-size="18" font-weight="bold" fill="#5a9e30" font-family="Arial Black">PFFFT!</text>
+        </g>
+      </svg>
+    </div>
+
+    <!-- HAMMER BONK animation -->
+    <div id="anim-bonk">
+      <svg width="100%" height="100%" viewBox="0 0 600 340" xmlns="http://www.w3.org/2000/svg">
+        <!-- Background -->
+        <rect width="600" height="340" fill="#fff9c4" rx="16"/>
+        <text x="300" y="36" text-anchor="middle" font-size="28" font-weight="bold" fill="#e65100" font-family="Arial Black, sans-serif">BONK!</text>
+
+        <!-- KID A (left, swinging hammer) -->
+        <g transform="translate(70, 55)">
+          <!-- Body -->
+          <ellipse cx="45" cy="85" rx="22" ry="32" fill="#4fc3f7"/>
+          <!-- Head -->
+          <circle cx="45" cy="43" r="28" fill="#ffe0b2"/>
+          <!-- Eyes - determined squint -->
+          <ellipse cx="37" cy="39" rx="5" ry="3" fill="#222"/>
+          <ellipse cx="53" cy="39" rx="5" ry="3" fill="#222"/>
+          <!-- Smirk -->
+          <path d="M37 54 Q45 60 54 52" stroke="#333" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <!-- Hair -->
+          <path d="M19 33 Q45 13 71 33" stroke="#8d6e63" stroke-width="6" fill="none"/>
+          <!-- Arm holding hammer (right arm raised) -->
+          <line x1="63" y1="80" x2="100" y2="45" stroke="#4fc3f7" stroke-width="9" stroke-linecap="round"/>
+          <!-- Left arm down -->
+          <line x1="27" y1="90" x2="8" y2="115" stroke="#4fc3f7" stroke-width="8" stroke-linecap="round"/>
+          <!-- Legs -->
+          <line x1="35" y1="117" x2="25" y2="165" stroke="#1565c0" stroke-width="9" stroke-linecap="round"/>
+          <line x1="55" y1="117" x2="65" y2="165" stroke="#1565c0" stroke-width="9" stroke-linecap="round"/>
+          <!-- Shoes -->
+          <ellipse cx="27" cy="172" rx="12" ry="6" fill="#333"/>
+          <ellipse cx="63" cy="172" rx="12" ry="6" fill="#333"/>
+
+          <!-- HAMMER GROUP -->
+          <g class="hammer-group">
+            <!-- Handle -->
+            <line x1="100" y1="45" x2="155" y2="-10" stroke="#8d6e63" stroke-width="8" stroke-linecap="round"/>
+            <!-- Hammer head -->
+            <rect x="138" y="-28" width="44" height="24" rx="5" fill="#9e9e9e" stroke="#666" stroke-width="2"/>
+            <rect x="140" y="-26" width="40" height="8" rx="2" fill="#bdbdbd"/>
+          </g>
+        </g>
+
+        <!-- KID B (right, getting bonked) -->
+        <g class="bonk-kid-b" transform="translate(360, 60)">
+          <!-- Body -->
+          <ellipse cx="45" cy="85" rx="22" ry="32" fill="#ce93d8"/>
+          <!-- Head -->
+          <circle cx="45" cy="43" r="28" fill="#ffe0b2"/>
+          <!-- Eyes - shocked/squished -->
+          <ellipse cx="37" cy="38" rx="5" ry="6" fill="#222"/>
+          <ellipse cx="53" cy="38" rx="5" ry="6" fill="#222"/>
+          <!-- Shocked O mouth -->
+          <ellipse cx="45" cy="54" rx="8" ry="9" fill="#333"/>
+          <ellipse cx="45" cy="54" rx="5" ry="6" fill="#880"/>
+          <!-- Hair - spiky from impact -->
+          <path d="M19 28 Q25 8 35 18 Q40 5 45 15 Q50 5 55 18 Q65 8 71 28" stroke="#8d6e63" stroke-width="5" fill="none"/>
+          <!-- Arms out -->
+          <line x1="23" y1="80" x2="-5" y2="60" stroke="#ce93d8" stroke-width="8" stroke-linecap="round"/>
+          <line x1="67" y1="80" x2="95" y2="60" stroke="#ce93d8" stroke-width="8" stroke-linecap="round"/>
+          <!-- Legs together (bracing) -->
+          <line x1="38" y1="117" x2="30" y2="165" stroke="#7b1fa2" stroke-width="9" stroke-linecap="round"/>
+          <line x1="52" y1="117" x2="60" y2="165" stroke="#7b1fa2" stroke-width="9" stroke-linecap="round"/>
+          <!-- Shoes -->
+          <ellipse cx="32" cy="172" rx="12" ry="6" fill="#333"/>
+          <ellipse cx="58" cy="172" rx="12" ry="6" fill="#333"/>
+
+          <!-- Dizzy stars above head -->
+          <g transform="translate(45, 10)">
+            <g class="dizzy-star">
+              <polygon points="0,-10 3,-3 10,-3 5,2 7,9 0,5 -7,9 -5,2 -10,-3 -3,-3" fill="#FFD700" stroke="#e65100" stroke-width="1"/>
+            </g>
+            <g class="dizzy-star" style="animation-delay:0.2s">
+              <polygon points="0,-10 3,-3 10,-3 5,2 7,9 0,5 -7,9 -5,2 -10,-3 -3,-3" fill="#ff5252" stroke="#b71c1c" stroke-width="1"/>
+            </g>
+            <g class="dizzy-star" style="animation-delay:0.1s">
+              <polygon points="0,-10 3,-3 10,-3 5,2 7,9 0,5 -7,9 -5,2 -10,-3 -3,-3" fill="#69f0ae" stroke="#00695c" stroke-width="1"/>
+            </g>
+          </g>
+        </g>
+
+        <!-- BANG starburst -->
+        <g class="bang-burst" transform="translate(290, 60)">
+          <!-- Starburst shape -->
+          <polygon points="60,0 72,45 115,30 85,65 120,80 75,85 90,130 55,100 40,140 35,95 -10,105 20,70 -15,45 30,50 15,5 55,35" fill="#FFD700" stroke="#e65100" stroke-width="3"/>
+          <polygon points="60,10 68,42 105,30 82,60 112,75 72,79 85,120 54,96 42,130 38,89 -3,98 23,67 -8,45 28,49 16,12 53,38" fill="#FF5722" opacity="0.5"/>
+          <text x="60" y="75" text-anchor="middle" font-size="26" font-weight="bold" fill="#fff" font-family="Arial Black" stroke="#e65100" stroke-width="2">BANG!</text>
+        </g>
+
+        <!-- Speech bubble BONK -->
+        <g class="speech-bubble-bonk" transform="translate(380, 200)">
+          <ellipse cx="60" cy="30" rx="58" ry="26" fill="#fff" stroke="#333" stroke-width="3"/>
+          <polygon points="30,56 15,75 45,56" fill="#fff" stroke="#333" stroke-width="3"/>
+          <text x="60" y="37" text-anchor="middle" font-size="18" font-weight="bold" fill="#e65100" font-family="Arial Black">BONK!</text>
+        </g>
+      </svg>
+    </div>
+
+  </div><!-- /anim-container -->
+
+  <!-- Result screen -->
+  <div id="result-screen">
+    <div id="result-title">GAME OVER</div>
+    <div id="result-stats"></div>
+    <button class="play-again-btn" id="play-again-btn">Play Again</button>
+  </div>
+</div><!-- /overlay -->
+
+<!-- Confetti container -->
+<div id="confetti-container"></div>
+
+<script>
+// ===== CONFIG =====
+const DIFFICULTIES = {
+  easy:   { rows: 9,  cols: 9,  mines: 10 },
+  medium: { rows: 16, cols: 16, mines: 40 },
+  hard:   { rows: 16, cols: 30, mines: 99 },
+};
+
+// ===== STATE =====
+let difficulty = 'easy';
+let config = DIFFICULTIES[difficulty];
+let board = [];       // 2D array of cell objects
+let revealed = [];    // 2D bool
+let flagged = [];     // 2D bool
+let mineLocations = [];
+let gameState = 'idle'; // idle | playing | dead | won
+let firstClick = true;
+let timerInterval = null;
+let elapsed = 0;
+let flagCount = 0;
+
+// ===== DOM =====
+const grid = document.getElementById('grid');
+const mineCounter = document.getElementById('mine-counter');
+const timerDisplay = document.getElementById('timer');
+const resetBtn = document.getElementById('reset-btn');
+const overlay = document.getElementById('overlay');
+const animContainer = document.getElementById('anim-container');
+const animFart = document.getElementById('anim-fart');
+const animBonk = document.getElementById('anim-bonk');
+const resultScreen = document.getElementById('result-screen');
+const resultTitle = document.getElementById('result-title');
+const resultStats = document.getElementById('result-stats');
+const playAgainBtn = document.getElementById('play-again-btn');
+const confettiContainer = document.getElementById('confetti-container');
+
+// ===== INIT =====
+function initGame() {
+  clearInterval(timerInterval);
+  elapsed = 0;
+  flagCount = 0;
+  firstClick = true;
+  gameState = 'idle';
+  resetBtn.textContent = '😊';
+  updateTimer();
+  updateMineCounter();
+
+  config = DIFFICULTIES[difficulty];
+  const { rows, cols, mines } = config;
+
+  // Build empty board
+  board = [];
+  revealed = [];
+  flagged = [];
+  for (let r = 0; r < rows; r++) {
+    board.push(Array(cols).fill(0));
+    revealed.push(Array(cols).fill(false));
+    flagged.push(Array(cols).fill(false));
+  }
+  mineLocations = [];
+
+  renderGrid();
+  hideOverlay();
+  confettiContainer.innerHTML = '';
+}
+
+function placeMines(safeR, safeC) {
+  const { rows, cols, mines } = config;
+  const cells = [];
+  for (let r = 0; r < rows; r++)
+    for (let c = 0; c < cols; c++)
+      if (!(r === safeR && c === safeC)) cells.push([r, c]);
+
+  // Shuffle and pick first `mines`
+  for (let i = cells.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [cells[i], cells[j]] = [cells[j], cells[i]];
+  }
+  mineLocations = cells.slice(0, mines);
+
+  // Reset board numbers
+  for (let r = 0; r < rows; r++) board[r].fill(0);
+
+  for (const [mr, mc] of mineLocations) {
+    board[mr][mc] = -1;
+  }
+
+  // Compute neighbor counts
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (board[r][c] === -1) continue;
+      let count = 0;
+      for (const [dr, dc] of neighbors()) {
+        const nr = r + dr, nc = c + dc;
+        if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && board[nr][nc] === -1) count++;
+      }
+      board[r][c] = count;
+    }
+  }
+}
+
+function neighbors() {
+  return [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+}
+
+// ===== RENDER =====
+function renderGrid() {
+  const { rows, cols } = config;
+  grid.style.gridTemplateColumns = `repeat(${cols}, 32px)`;
+  grid.innerHTML = '';
+
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.dataset.r = r;
+      cell.dataset.c = c;
+      cell.addEventListener('click', onCellClick);
+      cell.addEventListener('contextmenu', onCellRightClick);
+      grid.appendChild(cell);
+    }
+  }
+}
+
+function updateCell(r, c) {
+  const cell = grid.querySelector(`[data-r="${r}"][data-c="${c}"]`);
+  if (!cell) return;
+
+  cell.className = 'cell';
+  cell.textContent = '';
+
+  if (revealed[r][c]) {
+    cell.classList.add('revealed');
+    const val = board[r][c];
+    if (val === -1) {
+      cell.textContent = '💣';
+    } else if (val > 0) {
+      cell.textContent = val;
+      cell.classList.add(`n${val}`);
+    }
+  } else if (flagged[r][c]) {
+    cell.classList.add('flagged');
+    cell.textContent = '🚩';
+  }
+}
+
+// ===== CLICK HANDLERS =====
+function onCellClick(e) {
+  if (gameState === 'dead' || gameState === 'won') return;
+  const r = +this.dataset.r;
+  const c = +this.dataset.c;
+  if (revealed[r][c] || flagged[r][c]) return;
+
+  if (firstClick) {
+    firstClick = false;
+    placeMines(r, c);
+    gameState = 'playing';
+    startTimer();
+  }
+
+  revealCell(r, c);
+  checkWin();
+}
+
+function onCellRightClick(e) {
+  e.preventDefault();
+  if (gameState === 'dead' || gameState === 'won') return;
+  const r = +this.dataset.r;
+  const c = +this.dataset.c;
+  if (revealed[r][c]) return;
+
+  flagged[r][c] = !flagged[r][c];
+  flagCount += flagged[r][c] ? 1 : -1;
+  updateCell(r, c);
+  updateMineCounter();
+}
+
+// ===== REVEAL LOGIC =====
+function revealCell(r, c) {
+  const { rows, cols } = config;
+  if (r < 0 || r >= rows || c < 0 || c >= cols) return;
+  if (revealed[r][c] || flagged[r][c]) return;
+
+  revealed[r][c] = true;
+
+  if (board[r][c] === -1) {
+    // Hit a mine!
+    updateCell(r, c);
+    const cell = grid.querySelector(`[data-r="${r}"][data-c="${c}"]`);
+    if (cell) cell.classList.add('mine-hit');
+    triggerDeath(r, c);
+    return;
+  }
+
+  updateCell(r, c);
+
+  // Flood fill if 0
+  if (board[r][c] === 0) {
+    for (const [dr, dc] of neighbors()) {
+      revealCell(r + dr, c + dc);
+    }
+  }
+}
+
+function triggerDeath(hitR, hitC) {
+  gameState = 'dead';
+  clearInterval(timerInterval);
+  resetBtn.textContent = '😵';
+
+  // Reveal all mines
+  setTimeout(() => {
+    for (const [mr, mc] of mineLocations) {
+      if (!revealed[mr][mc]) {
+        revealed[mr][mc] = true;
+        updateCell(mr, mc);
+        const cell = grid.querySelector(`[data-r="${mr}"][data-c="${mc}"]`);
+        if (cell) cell.classList.add('mine-shown');
+      }
+    }
+  }, 200);
+
+  // Show random animation after short delay
+  setTimeout(() => showDeathAnimation(), 600);
+}
+
+function checkWin() {
+  if (gameState !== 'playing') return;
+  const { rows, cols, mines } = config;
+  let unrevealedNonMines = 0;
+  for (let r = 0; r < rows; r++)
+    for (let c = 0; c < cols; c++)
+      if (!revealed[r][c] && board[r][c] !== -1) unrevealedNonMines++;
+
+  if (unrevealedNonMines === 0) {
+    gameState = 'won';
+    clearInterval(timerInterval);
+    resetBtn.textContent = '😎';
+    // Flag remaining mines
+    for (const [mr, mc] of mineLocations) {
+      if (!flagged[mr][mc]) { flagged[mr][mc] = true; }
+    }
+    flagCount = mines;
+    updateMineCounter();
+    setTimeout(showWin, 500);
+  }
+}
+
+// ===== TIMER =====
+function startTimer() {
+  elapsed = 0;
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    elapsed++;
+    if (elapsed > 999) elapsed = 999;
+    updateTimer();
+  }, 1000);
+}
+
+function updateTimer() {
+  timerDisplay.textContent = String(elapsed).padStart(3, '0');
+}
+
+function updateMineCounter() {
+  const remaining = config.mines - flagCount;
+  const val = Math.max(-99, Math.min(999, remaining));
+  const str = val < 0 ? '-' + String(Math.abs(val)).padStart(2, '0') : String(val).padStart(3, '0');
+  mineCounter.textContent = str;
+}
+
+// ===== ANIMATIONS =====
+function showDeathAnimation() {
+  overlay.classList.add('show');
+  resultScreen.classList.remove('show');
+  animContainer.style.display = 'block';
+
+  const useAnim = Math.random() < 0.5 ? 'fart' : 'bonk';
+
+  animFart.classList.remove('show');
+  animBonk.classList.remove('show');
+
+  if (useAnim === 'fart') {
+    animFart.classList.add('show');
+  } else {
+    animBonk.classList.add('show');
+  }
+
+  // After 3 seconds, show game over screen
+  setTimeout(() => {
+    animContainer.style.display = 'none';
+    showGameOver();
+  }, 3000);
+}
+
+function showGameOver() {
+  resultTitle.textContent = 'GAME OVER';
+  resultTitle.className = '';
+  resultScreen.style.borderColor = '#e94560';
+  playAgainBtn.className = 'play-again-btn';
+  resultStats.textContent = `Time: ${elapsed}s`;
+  resultScreen.classList.add('show');
+}
+
+function showWin() {
+  overlay.classList.add('show');
+  animContainer.style.display = 'none';
+  animFart.classList.remove('show');
+  animBonk.classList.remove('show');
+
+  resultTitle.textContent = '🎉 YOU WIN! 🎉';
+  resultTitle.className = 'win';
+  resultScreen.style.borderColor = '#81c784';
+  playAgainBtn.className = 'play-again-btn win';
+  resultStats.textContent = `Difficulty: ${difficulty} | Time: ${elapsed}s | Mines: ${config.mines}`;
+  resultScreen.classList.add('show');
+
+  launchConfetti();
+}
+
+function hideOverlay() {
+  overlay.classList.remove('show');
+  animFart.classList.remove('show');
+  animBonk.classList.remove('show');
+  animContainer.style.display = 'none';
+  resultScreen.classList.remove('show');
+}
+
+// ===== CONFETTI =====
+function launchConfetti() {
+  confettiContainer.innerHTML = '';
+  const colors = ['#e94560','#4fc3f7','#81c784','#FFD700','#ce93d8','#ff8a65','#40e0d0','#ff5252'];
+  const shapes = ['square','circle','rect'];
+
+  for (let i = 0; i < 120; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    const shape = shapes[Math.floor(Math.random() * shapes.length)];
+    const size = 6 + Math.random() * 10;
+    const left = Math.random() * 100;
+    const duration = 2 + Math.random() * 3;
+    const delay = Math.random() * 2;
+
+    el.style.cssText = `
+      left: ${left}%;
+      width: ${shape === 'rect' ? size * 0.5 : size}px;
+      height: ${shape === 'rect' ? size * 1.5 : size}px;
+      background: ${color};
+      border-radius: ${shape === 'circle' ? '50%' : '2px'};
+      animation-duration: ${duration}s;
+      animation-delay: ${delay}s;
+      opacity: 0;
+    `;
+    confettiContainer.appendChild(el);
+
+    // Animate after a frame
+    setTimeout(() => { el.style.opacity = '1'; }, 10);
+  }
+}
+
+// ===== DIFFICULTY BUTTONS =====
+document.querySelectorAll('.diff-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    difficulty = this.dataset.diff;
+    initGame();
+  });
+});
+
+// ===== RESET BUTTON =====
+resetBtn.addEventListener('click', initGame);
+
+// ===== PLAY AGAIN =====
+playAgainBtn.addEventListener('click', () => {
+  confettiContainer.innerHTML = '';
+  initGame();
+});
+
+// ===== START =====
+initGame();
+</script>
+</body>
+</html>
