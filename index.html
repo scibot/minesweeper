@@ -284,60 +284,6 @@
     transform-origin: bottom center;
   }
 
-  /* ============= ANIMATION B: Hammer Bonk ============= */
-  #anim-bonk {
-    display: none;
-    width: 100%;
-    height: 100%;
-    position: relative;
-    animation: fadeIn 0.3s ease;
-  }
-  #anim-bonk.show { display: block; }
-
-  /* Hammer swings from raised → down */
-  @keyframes hammerSwing {
-    0%,50% { transform: rotate(-75deg); }
-    72%    { transform: rotate(45deg);  }
-    100%   { transform: rotate(42deg);  }
-  }
-
-  /* Bang starburst explodes on impact */
-  @keyframes bangAppear {
-    0%,68% { transform: scale(0) rotate(0deg);   opacity: 0; }
-    75%    { transform: scale(1.4) rotate(8deg);  opacity: 1; }
-    85%    { transform: scale(1)   rotate(-3deg); opacity: 1; }
-    100%   { transform: scale(1)   rotate(0deg);  opacity: 1; }
-  }
-
-  /* Dizzy stars orbit Kid B's head */
-  @keyframes orbitStar {
-    from { transform: rotate(0deg)   translateX(36px) rotate(0deg);    }
-    to   { transform: rotate(360deg) translateX(36px) rotate(-360deg); }
-  }
-
-  /* Kid B wobbles on bonk */
-  @keyframes bonkWobble {
-    0%,68%  { transform: translate(0,0)      rotate(0deg);  }
-    75%     { transform: translate(-6px,-12px) rotate(-6deg); }
-    82%     { transform: translate(4px, 5px)  rotate( 4deg); }
-    90%     { transform: translate(-2px,-3px) rotate(-2deg); }
-    100%    { transform: translate(0,0)       rotate(0deg);  }
-  }
-
-  /* hammer-group pivots around Kid A's hand — set via transform-origin on the wrapper */
-  .hammer-pivot { transform-origin: 0px 0px; animation: hammerSwing 3s ease forwards; }
-  .bang-burst   { animation: bangAppear 3s ease forwards; transform-origin: center; }
-  .dizzy-star   { animation: orbitStar 0.65s linear infinite; animation-delay: 2.3s; }
-  .dizzy-star:nth-child(2) { animation-delay: 2.5s; animation-duration: 0.75s; }
-  .dizzy-star:nth-child(3) { animation-delay: 2.4s; animation-duration: 0.55s; }
-  .bonk-kid-b   { animation: bonkWobble 3s ease forwards; }
-  .speech-bubble-bonk {
-    animation: bubblePop 0.45s ease forwards;
-    animation-delay: 2.2s;
-    opacity: 0;
-    transform-origin: bottom left;
-  }
-
   /* ============= Confetti ============= */
   #confetti-container {
     position: fixed;
@@ -576,8 +522,8 @@
       </svg>
     </div>
 
-    <!-- HAMMER BONK animation -->
-    <div id="anim-bonk">
+    <!-- (bonk animation removed) -->
+    <div id="anim-bonk" style="display:none">
       <svg width="100%" height="100%" viewBox="0 0 600 340" xmlns="http://www.w3.org/2000/svg">
         <rect width="600" height="340" fill="#fff9c4" rx="18"/>
         <rect x="0" y="298" width="600" height="42" fill="#ffe082"/>
@@ -784,7 +730,6 @@ const resetBtn = document.getElementById('reset-btn');
 const overlay = document.getElementById('overlay');
 const animContainer = document.getElementById('anim-container');
 const animFart = document.getElementById('anim-fart');
-const animBonk = document.getElementById('anim-bonk');
 const resultScreen = document.getElementById('result-screen');
 const resultTitle = document.getElementById('result-title');
 const resultStats = document.getElementById('result-stats');
@@ -1030,16 +975,8 @@ function showDeathAnimation() {
   resultScreen.classList.remove('show');
   animContainer.style.display = 'block';
 
-  const useAnim = Math.random() < 0.5 ? 'fart' : 'bonk';
-
   animFart.classList.remove('show');
-  animBonk.classList.remove('show');
-
-  if (useAnim === 'fart') {
-    animFart.classList.add('show');
-  } else {
-    animBonk.classList.add('show');
-  }
+  animFart.classList.add('show');
 
   // After 3 seconds, show game over screen
   setTimeout(() => {
@@ -1061,7 +998,6 @@ function showWin() {
   overlay.classList.add('show');
   animContainer.style.display = 'none';
   animFart.classList.remove('show');
-  animBonk.classList.remove('show');
 
   resultTitle.textContent = '🎉 YOU WIN! 🎉';
   resultTitle.className = 'win';
@@ -1076,7 +1012,6 @@ function showWin() {
 function hideOverlay() {
   overlay.classList.remove('show');
   animFart.classList.remove('show');
-  animBonk.classList.remove('show');
   animContainer.style.display = 'none';
   resultScreen.classList.remove('show');
 }
