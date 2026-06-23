@@ -181,9 +181,9 @@
   #anim-container {
     position: relative;
     z-index: 1001;
-    width: 600px;
-    height: 340px;
-    max-width: 95vw;
+    width: 660px;
+    height: 380px;
+    max-width: 96vw;
   }
 
   /* Game over / win screen */
@@ -244,49 +244,42 @@
 
   @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
 
-  /* Fart cloud flying */
+  /* Fart cloud flying left-to-right */
   @keyframes fartFly {
-    0% { transform: translateX(0) scaleX(1); opacity: 0; }
-    10% { opacity: 1; }
-    80% { transform: translateX(220px) scaleX(1.3); opacity: 1; }
-    100% { transform: translateX(240px) scaleX(1.4); opacity: 0.8; }
+    0%   { transform: translateX(0)     scaleX(1);   opacity: 0; }
+    12%  { opacity: 1; }
+    80%  { transform: translateX(230px) scaleX(1.3); opacity: 1; }
+    100% { transform: translateX(250px) scaleX(1.4); opacity: 0.85; }
   }
 
-  /* Kid B recoil */
+  /* Kid B recoils right when fart hits */
   @keyframes recoil {
-    0%,60% { transform: translateX(0) rotate(0); }
-    70% { transform: translateX(30px) rotate(8deg); }
-    80% { transform: translateX(25px) rotate(6deg); }
-    100% { transform: translateX(25px) rotate(6deg); }
+    0%,55%  { transform: translate(0,0)      rotate(0deg); }
+    70%     { transform: translate(22px,-4px) rotate(10deg); }
+    85%     { transform: translate(18px,-2px) rotate(7deg); }
+    100%    { transform: translate(18px,-2px) rotate(7deg); }
   }
 
-  /* Stink lines */
+  /* Stink lines appear after cloud arrives */
   @keyframes stink {
-    0%, 60% { opacity: 0; }
-    70%, 90% { opacity: 1; }
-    100% { opacity: 0.8; }
+    0%,55%  { opacity: 0; }
+    70%,95% { opacity: 1; }
+    100%    { opacity: 0.85; }
   }
 
   /* Speech bubble pop */
   @keyframes bubblePop {
-    0% { transform: scale(0); opacity: 0; }
-    50% { transform: scale(1.2); opacity: 1; }
-    100% { transform: scale(1); opacity: 1; }
+    0%   { transform: scale(0); opacity: 0; }
+    55%  { transform: scale(1.25); opacity: 1; }
+    100% { transform: scale(1);    opacity: 1; }
   }
 
-  .fart-cloud {
-    animation: fartFly 2s ease-in forwards;
-    animation-delay: 0.5s;
-  }
-  .kid-b-group {
-    animation: recoil 3s ease forwards;
-  }
-  .stink-lines {
-    animation: stink 3s ease forwards;
-  }
+  .fart-cloud        { animation: fartFly 2.2s ease-in forwards; animation-delay: 0.4s; }
+  .kid-b-group       { animation: recoil  3s   ease    forwards; }
+  .stink-lines       { animation: stink   3s   ease    forwards; }
   .speech-bubble-fart {
-    animation: bubblePop 0.4s ease forwards;
-    animation-delay: 0.3s;
+    animation: bubblePop 0.45s ease forwards;
+    animation-delay: 0.2s;
     opacity: 0;
     transform-origin: bottom center;
   }
@@ -301,58 +294,46 @@
   }
   #anim-bonk.show { display: block; }
 
-  /* Hammer swing */
+  /* Hammer swings from raised → down */
   @keyframes hammerSwing {
-    0% { transform: rotate(-80deg) translateY(-20px); }
-    60% { transform: rotate(-80deg) translateY(-20px); }
-    80% { transform: rotate(30deg) translateY(10px); }
-    85% { transform: rotate(25deg); }
-    100% { transform: rotate(25deg); }
+    0%,50% { transform: rotate(-75deg); }
+    72%    { transform: rotate(45deg);  }
+    100%   { transform: rotate(42deg);  }
   }
 
-  /* Bang starburst */
+  /* Bang starburst explodes on impact */
   @keyframes bangAppear {
-    0%, 75% { transform: scale(0); opacity: 0; }
-    80% { transform: scale(1.3); opacity: 1; }
-    90% { transform: scale(1); opacity: 1; }
-    100% { transform: scale(1); opacity: 1; }
+    0%,68% { transform: scale(0) rotate(0deg);   opacity: 0; }
+    75%    { transform: scale(1.4) rotate(8deg);  opacity: 1; }
+    85%    { transform: scale(1)   rotate(-3deg); opacity: 1; }
+    100%   { transform: scale(1)   rotate(0deg);  opacity: 1; }
   }
 
-  /* Dizzy stars orbit */
+  /* Dizzy stars orbit Kid B's head */
   @keyframes orbitStar {
-    from { transform: rotate(0deg) translateX(30px) rotate(0deg); }
-    to { transform: rotate(360deg) translateX(30px) rotate(-360deg); }
+    from { transform: rotate(0deg)   translateX(36px) rotate(0deg);    }
+    to   { transform: rotate(360deg) translateX(36px) rotate(-360deg); }
   }
 
-  /* Kid B bonk wobble */
+  /* Kid B wobbles on bonk */
   @keyframes bonkWobble {
-    0%,75% { transform: translateY(0) rotate(0); }
-    80% { transform: translateY(-10px) rotate(-5deg); }
-    85% { transform: translateY(5px) rotate(3deg); }
-    90% { transform: translateY(-3px) rotate(-2deg); }
-    100% { transform: translateY(0) rotate(0); }
+    0%,68%  { transform: translate(0,0)      rotate(0deg);  }
+    75%     { transform: translate(-6px,-12px) rotate(-6deg); }
+    82%     { transform: translate(4px, 5px)  rotate( 4deg); }
+    90%     { transform: translate(-2px,-3px) rotate(-2deg); }
+    100%    { transform: translate(0,0)       rotate(0deg);  }
   }
 
-  .hammer-group {
-    transform-origin: 80px 20px;
-    animation: hammerSwing 3s ease forwards;
-  }
-  .bang-burst {
-    animation: bangAppear 3s ease forwards;
-    transform-origin: center;
-  }
-  .dizzy-star {
-    animation: orbitStar 0.6s linear infinite;
-    animation-delay: 2.4s;
-  }
-  .dizzy-star:nth-child(2) { animation-delay: 2.6s; animation-duration: 0.7s; }
-  .dizzy-star:nth-child(3) { animation-delay: 2.5s; animation-duration: 0.8s; }
-  .bonk-kid-b {
-    animation: bonkWobble 3s ease forwards;
-  }
+  /* hammer-group pivots around Kid A's hand — set via transform-origin on the wrapper */
+  .hammer-pivot { transform-origin: 0px 0px; animation: hammerSwing 3s ease forwards; }
+  .bang-burst   { animation: bangAppear 3s ease forwards; transform-origin: center; }
+  .dizzy-star   { animation: orbitStar 0.65s linear infinite; animation-delay: 2.3s; }
+  .dizzy-star:nth-child(2) { animation-delay: 2.5s; animation-duration: 0.75s; }
+  .dizzy-star:nth-child(3) { animation-delay: 2.4s; animation-duration: 0.55s; }
+  .bonk-kid-b   { animation: bonkWobble 3s ease forwards; }
   .speech-bubble-bonk {
-    animation: bubblePop 0.4s ease forwards;
-    animation-delay: 2.3s;
+    animation: bubblePop 0.45s ease forwards;
+    animation-delay: 2.2s;
     opacity: 0;
     transform-origin: bottom left;
   }
@@ -407,194 +388,351 @@
 
     <!-- FART FACE animation -->
     <div id="anim-fart">
+      <!--
+        Layout (viewBox 600×340):
+          Kid A  – back to viewer, butt out, at x≈120  (South Park stubby)
+          Cloud  – starts near butt x≈168, flies right
+          Kid B  – faces forward (reacts), at x≈460
+      -->
       <svg width="100%" height="100%" viewBox="0 0 600 340" xmlns="http://www.w3.org/2000/svg">
-        <!-- Background -->
-        <rect width="600" height="340" fill="#ffe066" rx="16"/>
-        <text x="300" y="36" text-anchor="middle" font-size="28" font-weight="bold" fill="#c00" font-family="Arial Black, sans-serif">PFFFT!</text>
+        <!-- Sky-yellow background -->
+        <rect width="600" height="340" fill="#fff176" rx="18"/>
+        <!-- Ground line -->
+        <rect x="0" y="305" width="600" height="35" rx="0" fill="#c8e6c9"/>
+        <!-- Stink aura in background -->
+        <ellipse cx="300" cy="200" rx="220" ry="90" fill="#f0ffd0" opacity="0.5"/>
 
-        <!-- KID A (left, pants down) -->
-        <g transform="translate(80, 60)">
-          <!-- Body -->
-          <ellipse cx="40" cy="80" rx="22" ry="32" fill="#4fc3f7"/>
-          <!-- Head -->
-          <circle cx="40" cy="38" r="28" fill="#ffe0b2"/>
-          <!-- Eyes -->
-          <ellipse cx="32" cy="34" rx="4" ry="5" fill="#222"/>
-          <ellipse cx="48" cy="34" rx="4" ry="5" fill="#222"/>
-          <!-- Evil grin -->
-          <path d="M28 48 Q40 58 52 48" stroke="#c00" stroke-width="3" fill="none" stroke-linecap="round"/>
-          <!-- Hair -->
-          <path d="M14 28 Q40 8 66 28" stroke="#8d6e63" stroke-width="6" fill="none"/>
-          <!-- Arms up -->
-          <line x1="18" y1="90" x2="-5" y2="65" stroke="#4fc3f7" stroke-width="8" stroke-linecap="round"/>
-          <line x1="62" y1="90" x2="85" y2="65" stroke="#4fc3f7" stroke-width="8" stroke-linecap="round"/>
-          <!-- Legs -->
-          <line x1="30" y1="112" x2="20" y2="155" stroke="#3a5a9f" stroke-width="9" stroke-linecap="round"/>
-          <line x1="50" y1="112" x2="60" y2="155" stroke="#3a5a9f" stroke-width="9" stroke-linecap="round"/>
-          <!-- Pants down (around ankles) -->
-          <rect x="10" y="148" width="60" height="16" rx="4" fill="#1a237e"/>
-          <!-- Bare butt region -->
-          <ellipse cx="40" cy="118" rx="24" ry="14" fill="#ffe0b2"/>
-          <!-- Butt crack hint -->
-          <path d="M40 106 Q40 122 40 130" stroke="#e0a060" stroke-width="2" fill="none"/>
-          <!-- Shoes -->
-          <ellipse cx="22" cy="162" rx="12" ry="6" fill="#333"/>
-          <ellipse cx="58" cy="162" rx="12" ry="6" fill="#333"/>
+        <!-- Big title -->
+        <text x="300" y="38" text-anchor="middle" font-size="32" font-weight="bold"
+              fill="#2e7d32" font-family="Arial Black,Impact,sans-serif"
+              stroke="#fff" stroke-width="4" paint-order="stroke">💨 PFFFT! 💨</text>
+
+        <!-- ═══════════════════════════════════════════════════
+             KID A  — South Park stubby, BACK TO VIEWER, butt out
+             Feet at global (120, 305)
+             ═══════════════════════════════════════════════════ -->
+        <g transform="translate(120,305)">
+
+          <!-- SHOES (from behind, toes pointing right = away from viewer) -->
+          <ellipse cx="-14" cy="-3" rx="19" ry="9" fill="#111"/>
+          <ellipse cx="14"  cy="-3" rx="19" ry="9" fill="#111"/>
+
+          <!-- BARE LOWER LEGS — skin (pants are DOWN) -->
+          <rect x="-20" y="-52" width="13" height="47" rx="6" fill="#ffe0b2"/>
+          <rect x="7"   y="-52" width="13" height="47" rx="6" fill="#ffe0b2"/>
+
+          <!-- PANTS bunched at ankles -->
+          <rect x="-27" y="-28" width="54" height="20" rx="6" fill="#1a237e"/>
+          <line x1="-27" y1="-20" x2="27" y2="-20" stroke="#283593" stroke-width="2"/>
+
+          <!-- ★ BIG BARE BUTT CHEEKS ★ -->
+          <!-- right cheek (closer to viewer right) -->
+          <ellipse cx="17"  cy="-72" rx="22" ry="26" fill="#ffe0b2"/>
+          <!-- left cheek -->
+          <ellipse cx="-17" cy="-72" rx="22" ry="26" fill="#ffe0b2"/>
+          <!-- Butt-crack shadow down the middle -->
+          <path d="M0,-50 Q2,-72 0,-96" stroke="#c8956c" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          <!-- Subtle shading on each cheek -->
+          <ellipse cx="22"  cy="-65" rx="10" ry="14" fill="#ffd29a" opacity="0.35"/>
+          <ellipse cx="-22" cy="-65" rx="10" ry="14" fill="#ffd29a" opacity="0.35"/>
+
+          <!-- ORANGE PARKA from behind (body) -->
+          <rect x="-34" y="-140" width="68" height="70" rx="12" fill="#e65100"/>
+          <!-- Parka upper yoke / hood neckline -->
+          <rect x="-34" y="-140" width="68" height="20" rx="12" fill="#ff7043"/>
+          <!-- Sleeve stubs sticking out sides -->
+          <ellipse cx="-46" cy="-122" rx="14" ry="10" fill="#e65100"/>
+          <ellipse cx=" 46" cy="-122" rx="14" ry="10" fill="#e65100"/>
+
+          <!-- BIG ROUND HEAD from behind -->
+          <circle cx="0" cy="-180" r="44" fill="#ffe0b2"/>
+          <!-- Ear hints -->
+          <ellipse cx="-41" cy="-180" rx="8" ry="11" fill="#ffcc9a"/>
+          <ellipse cx=" 41" cy="-180" rx="8" ry="11" fill="#ffcc9a"/>
+
+          <!-- ORANGE PARKA HOOD arching over head -->
+          <path d="M-44,-162 Q-50,-195 -32,-218 Q0,-238 32,-218 Q50,-195 44,-162"
+                stroke="#ff7043" stroke-width="16" fill="none" stroke-linecap="round"/>
+          <!-- Hood edge highlight -->
+          <path d="M-44,-162 Q-50,-195 -32,-218 Q0,-238 32,-218 Q50,-195 44,-162"
+                stroke="#ffccbc" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.5"/>
+          <!-- Pom-pom on top -->
+          <circle cx="0" cy="-240" r="13" fill="#efefef" stroke="#bdbdbd" stroke-width="2"/>
+
+          <!-- Fart-direction squiggle lines from butt heading right -->
+          <path d="M40,-68 Q58,-63 72,-68" stroke="#7cb342" stroke-width="4"
+                fill="none" stroke-linecap="round" opacity="0.7"/>
+          <path d="M42,-80 Q61,-76 76,-82" stroke="#7cb342" stroke-width="3"
+                fill="none" stroke-linecap="round" opacity="0.55"/>
+          <path d="M38,-56 Q55,-50 69,-56" stroke="#7cb342" stroke-width="3"
+                fill="none" stroke-linecap="round" opacity="0.5"/>
         </g>
 
-        <!-- FART CLOUD -->
-        <g class="fart-cloud" transform="translate(155, 155)" opacity="0">
-          <!-- Green fart cloud blobs -->
-          <ellipse cx="30" cy="20" rx="30" ry="22" fill="#76c442" opacity="0.9"/>
-          <ellipse cx="60" cy="15" rx="25" ry="20" fill="#8bc34a" opacity="0.85"/>
-          <ellipse cx="85" cy="22" rx="22" ry="18" fill="#76c442" opacity="0.9"/>
-          <ellipse cx="50" cy="35" rx="35" ry="20" fill="#a5d63a" opacity="0.8"/>
-          <ellipse cx="30" cy="38" rx="18" ry="14" fill="#8bc34a" opacity="0.7"/>
-          <ellipse cx="80" cy="38" rx="16" ry="14" fill="#76c442" opacity="0.75"/>
-          <!-- wavy lines inside -->
-          <path d="M20 24 Q35 18 50 24 Q65 30 80 24" stroke="#5a9e30" stroke-width="2" fill="none" opacity="0.6"/>
-          <path d="M25 32 Q45 26 65 32 Q75 36 90 30" stroke="#5a9e30" stroke-width="2" fill="none" opacity="0.5"/>
-          <!-- Stink symbols -->
-          <text x="35" y="12" font-size="16" fill="#5a9e30" opacity="0.7">~</text>
-          <text x="65" y="10" font-size="14" fill="#5a9e30" opacity="0.6">~</text>
+        <!-- ═══════════════════════════════════════════════════
+             FART CLOUD — starts near Kid A's butt, flies right
+             Cloud origin translate(168, 215) in SVG space
+             ═══════════════════════════════════════════════════ -->
+        <g class="fart-cloud" style="opacity:0" transform="translate(168,215)">
+          <!-- Layered green blobs -->
+          <ellipse cx="30"  cy="14" rx="36" ry="27" fill="#76c442" opacity="0.94"/>
+          <ellipse cx="66"  cy="4"  rx="31" ry="24" fill="#8bc34a" opacity="0.88"/>
+          <ellipse cx="97"  cy="17" rx="29" ry="23" fill="#76c442" opacity="0.91"/>
+          <ellipse cx="54"  cy="28" rx="44" ry="23" fill="#a5d63a" opacity="0.80"/>
+          <ellipse cx="18"  cy="25" rx="23" ry="18" fill="#8bc34a" opacity="0.74"/>
+          <ellipse cx="93"  cy="29" rx="21" ry="17" fill="#76c442" opacity="0.77"/>
+          <!-- Interior squiggles -->
+          <path d="M10,10 Q38,2 66,10 Q87,16 112,10"
+                stroke="#558b2f" stroke-width="2.5" fill="none" opacity="0.6"/>
+          <path d="M16,22 Q48,14 82,22 Q102,28 122,21"
+                stroke="#558b2f" stroke-width="2" fill="none" opacity="0.55"/>
+          <!-- Stink tildes -->
+          <text x="34" y="-5"  font-size="20" fill="#558b2f" opacity="0.85">~</text>
+          <text x="66" y="-9"  font-size="16" fill="#558b2f" opacity="0.75">~</text>
+          <text x="90" y="-3"  font-size="13" fill="#558b2f" opacity="0.6">~</text>
         </g>
 
-        <!-- KID B (right, recoiling) -->
-        <g class="kid-b-group" transform="translate(390, 55)">
-          <!-- Body -->
-          <ellipse cx="40" cy="80" rx="22" ry="32" fill="#ff8a65"/>
-          <!-- Head -->
-          <circle cx="40" cy="38" r="28" fill="#ffe0b2"/>
-          <!-- Eyes - wide shocked X eyes -->
-          <line x1="28" y1="30" x2="36" y2="38" stroke="#222" stroke-width="3"/>
-          <line x1="36" y1="30" x2="28" y2="38" stroke="#222" stroke-width="3"/>
-          <line x1="44" y1="30" x2="52" y2="38" stroke="#222" stroke-width="3"/>
-          <line x1="52" y1="30" x2="44" y2="38" stroke="#222" stroke-width="3"/>
-          <!-- Disgusted open mouth -->
-          <ellipse cx="40" cy="52" rx="10" ry="7" fill="#c00"/>
-          <path d="M33 52 Q40 46 47 52" fill="#ff6060"/>
-          <!-- Hair -->
-          <path d="M14 28 Q40 8 66 28" stroke="#8d6e63" stroke-width="6" fill="none"/>
-          <!-- Arms flailing -->
-          <line x1="18" y1="85" x2="-10" y2="60" stroke="#ff8a65" stroke-width="8" stroke-linecap="round"/>
-          <line x1="62" y1="85" x2="90" y2="55" stroke="#ff8a65" stroke-width="8" stroke-linecap="round"/>
-          <!-- Legs -->
-          <line x1="30" y1="112" x2="22" y2="160" stroke="#1a237e" stroke-width="9" stroke-linecap="round"/>
-          <line x1="50" y1="112" x2="58" y2="160" stroke="#1a237e" stroke-width="9" stroke-linecap="round"/>
-          <!-- Shoes -->
-          <ellipse cx="24" cy="167" rx="12" ry="6" fill="#333"/>
-          <ellipse cx="56" cy="167" rx="12" ry="6" fill="#333"/>
+        <!-- ═══════════════════════════════════════════════════
+             KID B  — South Park stubby, front-facing, SHOCKED
+             Feet at global (462, 305)
+             ═══════════════════════════════════════════════════ -->
+        <g class="kid-b-group" transform="translate(462,305)">
 
-          <!-- Stink lines near face -->
+          <!-- SHOES -->
+          <ellipse cx="-14" cy="-3" rx="19" ry="9" fill="#111"/>
+          <ellipse cx=" 14" cy="-3" rx="19" ry="9" fill="#111"/>
+
+          <!-- LEGS (blue parka pants) -->
+          <rect x="-20" y="-52" width="13" height="47" rx="6" fill="#1565c0"/>
+          <rect x="7"   y="-52" width="13" height="47" rx="6" fill="#1565c0"/>
+
+          <!-- BLUE PARKA BODY -->
+          <rect x="-34" y="-140" width="68" height="90" rx="12" fill="#1565c0"/>
+          <rect x="-34" y="-140" width="68" height="20" rx="12" fill="#1976d2"/>
+          <!-- Zipper line -->
+          <line x1="0" y1="-118" x2="0" y2="-52" stroke="#0d47a1" stroke-width="2.5" opacity="0.5"/>
+
+          <!-- Arms — flailing backward (recoil) -->
+          <ellipse cx="-48" cy="-118" rx="15" ry="9" fill="#1565c0"
+                   transform="rotate(30,-48,-118)"/>
+          <ellipse cx=" 48" cy="-118" rx="15" ry="9" fill="#1565c0"
+                   transform="rotate(-30,48,-118)"/>
+
+          <!-- BIG ROUND HEAD -->
+          <circle cx="0" cy="-180" r="44" fill="#ffe0b2"/>
+          <ellipse cx="-41" cy="-180" rx="8" ry="11" fill="#ffcc9a"/>
+          <ellipse cx=" 41" cy="-180" rx="8" ry="11" fill="#ffcc9a"/>
+
+          <!-- BLUE HOOD -->
+          <path d="M-44,-162 Q-50,-195 -32,-218 Q0,-238 32,-218 Q50,-195 44,-162"
+                stroke="#1976d2" stroke-width="16" fill="none" stroke-linecap="round"/>
+          <circle cx="0" cy="-240" r="13" fill="#efefef" stroke="#bdbdbd" stroke-width="2"/>
+
+          <!-- FACE — nauseated shock -->
+          <!-- X eyes -->
+          <line x1="-22" y1="-194" x2="-10" y2="-182" stroke="#111" stroke-width="4.5" stroke-linecap="round"/>
+          <line x1="-10" y1="-194" x2="-22" y2="-182" stroke="#111" stroke-width="4.5" stroke-linecap="round"/>
+          <line x1=" 10" y1="-194" x2=" 22" y2="-182" stroke="#111" stroke-width="4.5" stroke-linecap="round"/>
+          <line x1=" 22" y1="-194" x2=" 10" y2="-182" stroke="#111" stroke-width="4.5" stroke-linecap="round"/>
+          <!-- Open mouth (disgusted) -->
+          <ellipse cx="0" cy="-162" rx="13" ry="10" fill="#111"/>
+          <ellipse cx="0" cy="-166"  rx="8" ry="5"  fill="#cc0000"/>
+          <!-- Tongue wagging in horror -->
+          <ellipse cx="0" cy="-155"  rx="8" ry="6"  fill="#ff6666"/>
+          <!-- Green nauseated cheeks -->
+          <ellipse cx="-27" cy="-176" rx="12" ry="9" fill="#aeea00" opacity="0.45"/>
+          <ellipse cx=" 27" cy="-176" rx="12" ry="9" fill="#aeea00" opacity="0.45"/>
+          <!-- Sweat drop -->
+          <ellipse cx="30" cy="-196" rx="5" ry="7" fill="#90caf9" opacity="0.7"/>
+
+          <!-- STINK LINES (animate in when cloud hits) -->
           <g class="stink-lines" opacity="0">
-            <line x1="-10" y1="20" x2="-30" y2="5" stroke="#5a9e30" stroke-width="3" stroke-linecap="round"/>
-            <line x1="-8" y1="35" x2="-32" y2="30" stroke="#5a9e30" stroke-width="3" stroke-linecap="round"/>
-            <line x1="-5" y1="50" x2="-28" y2="52" stroke="#5a9e30" stroke-width="3" stroke-linecap="round"/>
-            <text x="-40" y="10" font-size="20" fill="#5a9e30">&#128169;</text>
+            <line x1="-52" y1="-196" x2="-76" y2="-208" stroke="#558b2f" stroke-width="4" stroke-linecap="round"/>
+            <line x1="-54" y1="-178" x2="-80" y2="-180" stroke="#558b2f" stroke-width="4" stroke-linecap="round"/>
+            <line x1="-50" y1="-161" x2="-76" y2="-156" stroke="#558b2f" stroke-width="4" stroke-linecap="round"/>
+            <text x="-108" y="-196" font-size="28" fill="#558b2f">😵</text>
+            <text x="-88"  y="-152" font-size="18" fill="#558b2f">💨</text>
           </g>
         </g>
 
-        <!-- Speech bubble PFFFT -->
-        <g class="speech-bubble-fart" transform="translate(60,180)">
-          <ellipse cx="60" cy="30" rx="60" ry="28" fill="#fff" stroke="#333" stroke-width="3"/>
-          <polygon points="60,58 75,72 85,58" fill="#fff" stroke="#333" stroke-width="3"/>
-          <text x="60" y="37" text-anchor="middle" font-size="18" font-weight="bold" fill="#5a9e30" font-family="Arial Black">PFFFT!</text>
+        <!-- Speech bubble (from Kid A's butt direction) -->
+        <g class="speech-bubble-fart" transform="translate(148,58)">
+          <ellipse cx="68" cy="30" rx="75" ry="30" fill="#fff" stroke="#2e7d32" stroke-width="3"/>
+          <!-- Tail pointing down toward butt -->
+          <polygon points="40,58 22,85 65,58" fill="#fff" stroke="#2e7d32" stroke-width="2.5"/>
+          <text x="68" y="38" text-anchor="middle" font-size="23" font-weight="bold"
+                fill="#2e7d32" font-family="Arial Black,Impact,sans-serif">PFFFT!</text>
         </g>
       </svg>
     </div>
 
     <!-- HAMMER BONK animation -->
     <div id="anim-bonk">
+      <!--
+        Layout (viewBox 600×340):
+          Kid A  – South Park stubby, facing right, hammer raised — at x≈128
+          Kid B  – South Park stubby, facing left, getting bonked — at x≈452
+          BANG   – centered at ≈(295,118)
+      -->
       <svg width="100%" height="100%" viewBox="0 0 600 340" xmlns="http://www.w3.org/2000/svg">
-        <!-- Background -->
-        <rect width="600" height="340" fill="#fff9c4" rx="16"/>
-        <text x="300" y="36" text-anchor="middle" font-size="28" font-weight="bold" fill="#e65100" font-family="Arial Black, sans-serif">BONK!</text>
+        <!-- Warm yellow background -->
+        <rect width="600" height="340" fill="#fff9c4" rx="18"/>
+        <rect x="0" y="305" width="600" height="35" fill="#ffe082"/>
+        <!-- Impact lines radiating from center -->
+        <line x1="300" y1="120" x2="50"  y2="20"  stroke="#ffe57f" stroke-width="3" opacity="0.6"/>
+        <line x1="300" y1="120" x2="550" y2="20"  stroke="#ffe57f" stroke-width="3" opacity="0.6"/>
+        <line x1="300" y1="120" x2="10"  y2="200" stroke="#ffe57f" stroke-width="3" opacity="0.5"/>
+        <line x1="300" y1="120" x2="590" y2="200" stroke="#ffe57f" stroke-width="3" opacity="0.5"/>
+        <line x1="300" y1="120" x2="300" y2="10"  stroke="#ffe57f" stroke-width="3" opacity="0.5"/>
 
-        <!-- KID A (left, swinging hammer) -->
-        <g transform="translate(70, 55)">
-          <!-- Body -->
-          <ellipse cx="45" cy="85" rx="22" ry="32" fill="#4fc3f7"/>
-          <!-- Head -->
-          <circle cx="45" cy="43" r="28" fill="#ffe0b2"/>
-          <!-- Eyes - determined squint -->
-          <ellipse cx="37" cy="39" rx="5" ry="3" fill="#222"/>
-          <ellipse cx="53" cy="39" rx="5" ry="3" fill="#222"/>
-          <!-- Smirk -->
-          <path d="M37 54 Q45 60 54 52" stroke="#333" stroke-width="3" fill="none" stroke-linecap="round"/>
-          <!-- Hair -->
-          <path d="M19 33 Q45 13 71 33" stroke="#8d6e63" stroke-width="6" fill="none"/>
-          <!-- Arm holding hammer (right arm raised) -->
-          <line x1="63" y1="80" x2="100" y2="45" stroke="#4fc3f7" stroke-width="9" stroke-linecap="round"/>
-          <!-- Left arm down -->
-          <line x1="27" y1="90" x2="8" y2="115" stroke="#4fc3f7" stroke-width="8" stroke-linecap="round"/>
-          <!-- Legs -->
-          <line x1="35" y1="117" x2="25" y2="165" stroke="#1565c0" stroke-width="9" stroke-linecap="round"/>
-          <line x1="55" y1="117" x2="65" y2="165" stroke="#1565c0" stroke-width="9" stroke-linecap="round"/>
-          <!-- Shoes -->
-          <ellipse cx="27" cy="172" rx="12" ry="6" fill="#333"/>
-          <ellipse cx="63" cy="172" rx="12" ry="6" fill="#333"/>
+        <!-- Title -->
+        <text x="300" y="38" text-anchor="middle" font-size="32" font-weight="bold"
+              fill="#e65100" font-family="Arial Black,Impact,sans-serif"
+              stroke="#fff" stroke-width="4" paint-order="stroke">🔨 BONK! 🔨</text>
 
-          <!-- HAMMER GROUP -->
-          <g class="hammer-group">
-            <!-- Handle -->
-            <line x1="100" y1="45" x2="155" y2="-10" stroke="#8d6e63" stroke-width="8" stroke-linecap="round"/>
-            <!-- Hammer head -->
-            <rect x="138" y="-28" width="44" height="24" rx="5" fill="#9e9e9e" stroke="#666" stroke-width="2"/>
-            <rect x="140" y="-26" width="40" height="8" rx="2" fill="#bdbdbd"/>
+        <!-- ═══════════════════════════════════════════════════
+             KID A  — South Park stubby, faces RIGHT, hammer arm raised
+             Feet at global (128, 305)
+             ═══════════════════════════════════════════════════ -->
+        <g transform="translate(128,305)">
+          <!-- SHOES -->
+          <ellipse cx="-15" cy="-3" rx="20" ry="9"  fill="#111"/>
+          <ellipse cx=" 15" cy="-3" rx="20" ry="9"  fill="#111"/>
+          <!-- LEGS (dark jeans) -->
+          <rect x="-21" y="-52" width="14" height="47" rx="6" fill="#1565c0"/>
+          <rect x="7"   y="-52" width="14" height="47" rx="6" fill="#1565c0"/>
+          <!-- BODY — red parka -->
+          <rect x="-34" y="-140" width="68" height="90" rx="12" fill="#c62828"/>
+          <rect x="-34" y="-140" width="68" height="20" rx="12" fill="#e53935"/>
+          <!-- Left arm hangs -->
+          <ellipse cx="-46" cy="-120" rx="14" ry="9" fill="#c62828" transform="rotate(-15,-46,-120)"/>
+          <!-- Right arm RAISED (swinging hammer) -->
+          <rect x="30" y="-148" width="13" height="52" rx="7" fill="#c62828" transform="rotate(35,36,-122)"/>
+          <!-- BIG HEAD -->
+          <circle cx="0" cy="-180" r="44" fill="#ffe0b2"/>
+          <ellipse cx="-41" cy="-180" rx="8" ry="11" fill="#ffcc9a"/>
+          <ellipse cx=" 41" cy="-180" rx="8" ry="11" fill="#ffcc9a"/>
+          <!-- Red parka hood -->
+          <path d="M-44,-162 Q-50,-195 -32,-218 Q0,-238 32,-218 Q50,-195 44,-162"
+                stroke="#e53935" stroke-width="16" fill="none" stroke-linecap="round"/>
+          <circle cx="0" cy="-240" r="13" fill="#efefef" stroke="#bdbdbd" stroke-width="2"/>
+          <!-- FACE — determined squint -->
+          <!-- Squint eyes -->
+          <ellipse cx="-15" cy="-186" rx="9" ry="4" fill="#111"/>
+          <ellipse cx=" 15" cy="-186" rx="9" ry="4" fill="#111"/>
+          <!-- Grin -->
+          <path d="M-12,-168 Q0,-160 12,-168" stroke="#333" stroke-width="3"
+                fill="none" stroke-linecap="round"/>
+          <!-- Eyebrows angled inward (angry determination) -->
+          <line x1="-22" y1="-196" x2="-8" y2="-192" stroke="#5d4037" stroke-width="3.5" stroke-linecap="round"/>
+          <line x1=" 22" y1="-196" x2=" 8" y2="-192" stroke="#5d4037" stroke-width="3.5" stroke-linecap="round"/>
+
+          <!-- ★ HAMMER — pivots around hand position (38,-138) in this group ★
+               Wrapped in an extra translate so transform-origin works at (0,0) -->
+          <g transform="translate(38,-138)">
+            <g class="hammer-pivot">
+              <!-- Handle -->
+              <line x1="0" y1="0" x2="90" y2="-62"
+                    stroke="#6d4c41" stroke-width="10" stroke-linecap="round"/>
+              <!-- Hammer head cross-piece -->
+              <rect x="80" y="-82" width="46" height="26" rx="6"
+                    fill="#9e9e9e" stroke="#616161" stroke-width="2"/>
+              <!-- Top highlight -->
+              <rect x="82" y="-80" width="42" height="9" rx="3" fill="#e0e0e0"/>
+              <!-- Nail/screw dots -->
+              <circle cx="90"  cy="-69" r="3" fill="#616161"/>
+              <circle cx="118" cy="-69" r="3" fill="#616161"/>
+            </g>
           </g>
         </g>
 
-        <!-- KID B (right, getting bonked) -->
-        <g class="bonk-kid-b" transform="translate(360, 60)">
-          <!-- Body -->
-          <ellipse cx="45" cy="85" rx="22" ry="32" fill="#ce93d8"/>
-          <!-- Head -->
-          <circle cx="45" cy="43" r="28" fill="#ffe0b2"/>
-          <!-- Eyes - shocked/squished -->
-          <ellipse cx="37" cy="38" rx="5" ry="6" fill="#222"/>
-          <ellipse cx="53" cy="38" rx="5" ry="6" fill="#222"/>
-          <!-- Shocked O mouth -->
-          <ellipse cx="45" cy="54" rx="8" ry="9" fill="#333"/>
-          <ellipse cx="45" cy="54" rx="5" ry="6" fill="#880"/>
-          <!-- Hair - spiky from impact -->
-          <path d="M19 28 Q25 8 35 18 Q40 5 45 15 Q50 5 55 18 Q65 8 71 28" stroke="#8d6e63" stroke-width="5" fill="none"/>
-          <!-- Arms out -->
-          <line x1="23" y1="80" x2="-5" y2="60" stroke="#ce93d8" stroke-width="8" stroke-linecap="round"/>
-          <line x1="67" y1="80" x2="95" y2="60" stroke="#ce93d8" stroke-width="8" stroke-linecap="round"/>
-          <!-- Legs together (bracing) -->
-          <line x1="38" y1="117" x2="30" y2="165" stroke="#7b1fa2" stroke-width="9" stroke-linecap="round"/>
-          <line x1="52" y1="117" x2="60" y2="165" stroke="#7b1fa2" stroke-width="9" stroke-linecap="round"/>
-          <!-- Shoes -->
-          <ellipse cx="32" cy="172" rx="12" ry="6" fill="#333"/>
-          <ellipse cx="58" cy="172" rx="12" ry="6" fill="#333"/>
+        <!-- ═══════════════════════════════════════════════════
+             KID B  — South Park stubby, facing viewer (mirrored),
+             getting bonked on the head
+             Feet at global (452, 305)
+             ═══════════════════════════════════════════════════ -->
+        <g class="bonk-kid-b" transform="translate(452,305)">
+          <!-- SHOES -->
+          <ellipse cx="-15" cy="-3" rx="20" ry="9"  fill="#111"/>
+          <ellipse cx=" 15" cy="-3" rx="20" ry="9"  fill="#111"/>
+          <!-- LEGS (purple parka pants) -->
+          <rect x="-21" y="-52" width="14" height="47" rx="6" fill="#6a1b9a"/>
+          <rect x="7"   y="-52" width="14" height="47" rx="6" fill="#6a1b9a"/>
+          <!-- BODY — purple parka -->
+          <rect x="-34" y="-140" width="68" height="90" rx="12" fill="#7b1fa2"/>
+          <rect x="-34" y="-140" width="68" height="20" rx="12" fill="#9c27b0"/>
+          <!-- Arms flailing sideways from shock -->
+          <ellipse cx="-50" cy="-118" rx="16" ry="9" fill="#7b1fa2"
+                   transform="rotate(40,-50,-118)"/>
+          <ellipse cx=" 50" cy="-118" rx="16" ry="9" fill="#7b1fa2"
+                   transform="rotate(-40,50,-118)"/>
+          <!-- BIG HEAD -->
+          <circle cx="0" cy="-180" r="44" fill="#ffe0b2"/>
+          <ellipse cx="-41" cy="-180" rx="8" ry="11" fill="#ffcc9a"/>
+          <ellipse cx=" 41" cy="-180" rx="8" ry="11" fill="#ffcc9a"/>
+          <!-- Purple hood -->
+          <path d="M-44,-162 Q-50,-195 -32,-218 Q0,-238 32,-218 Q50,-195 44,-162"
+                stroke="#9c27b0" stroke-width="16" fill="none" stroke-linecap="round"/>
+          <circle cx="0" cy="-240" r="13" fill="#efefef" stroke="#bdbdbd" stroke-width="2"/>
+          <!-- FACE — dazed O-mouth, spiral eyes -->
+          <!-- Spiral/dazed eyes (simple concentric circles) -->
+          <circle cx="-15" cy="-186" r="9"  fill="#fff" stroke="#111" stroke-width="2"/>
+          <circle cx="-15" cy="-186" r="5"  fill="#fff" stroke="#555" stroke-width="1.5"/>
+          <circle cx="-15" cy="-186" r="2"  fill="#333"/>
+          <circle cx=" 15" cy="-186" r="9"  fill="#fff" stroke="#111" stroke-width="2"/>
+          <circle cx=" 15" cy="-186" r="5"  fill="#fff" stroke="#555" stroke-width="1.5"/>
+          <circle cx=" 15" cy="-186" r="2"  fill="#333"/>
+          <!-- Shocked O-mouth -->
+          <ellipse cx="0" cy="-163" rx="12" ry="11" fill="#111"/>
+          <ellipse cx="0" cy="-166"  rx="8" ry="6"  fill="#8b0000"/>
+          <!-- Impact lump on top of head -->
+          <ellipse cx="4" cy="-222" rx="12" ry="8" fill="#ff7043" opacity="0.85"/>
+          <!-- Hair spikes from impact -->
+          <line x1="-30" y1="-220" x2="-42" y2="-238" stroke="#8d6e63" stroke-width="5" stroke-linecap="round"/>
+          <line x1=" -8" y1="-223" x2="-10" y2="-244" stroke="#8d6e63" stroke-width="5" stroke-linecap="round"/>
+          <line x1="  8" y1="-224" x2=" 12" y2="-246" stroke="#8d6e63" stroke-width="5" stroke-linecap="round"/>
+          <line x1=" 28" y1="-220" x2=" 40" y2="-240" stroke="#8d6e63" stroke-width="5" stroke-linecap="round"/>
 
-          <!-- Dizzy stars above head -->
-          <g transform="translate(45, 10)">
+          <!-- Dizzy stars orbiting head -->
+          <g transform="translate(0,-200)">
             <g class="dizzy-star">
-              <polygon points="0,-10 3,-3 10,-3 5,2 7,9 0,5 -7,9 -5,2 -10,-3 -3,-3" fill="#FFD700" stroke="#e65100" stroke-width="1"/>
+              <polygon points="0,-14 4,-5 14,-5 7,2 10,12 0,7 -10,12 -7,2 -14,-5 -4,-5"
+                       fill="#FFD700" stroke="#e65100" stroke-width="1.5"/>
             </g>
-            <g class="dizzy-star" style="animation-delay:0.2s">
-              <polygon points="0,-10 3,-3 10,-3 5,2 7,9 0,5 -7,9 -5,2 -10,-3 -3,-3" fill="#ff5252" stroke="#b71c1c" stroke-width="1"/>
+            <g class="dizzy-star">
+              <polygon points="0,-14 4,-5 14,-5 7,2 10,12 0,7 -10,12 -7,2 -14,-5 -4,-5"
+                       fill="#ff5252" stroke="#b71c1c" stroke-width="1.5"/>
             </g>
-            <g class="dizzy-star" style="animation-delay:0.1s">
-              <polygon points="0,-10 3,-3 10,-3 5,2 7,9 0,5 -7,9 -5,2 -10,-3 -3,-3" fill="#69f0ae" stroke="#00695c" stroke-width="1"/>
+            <g class="dizzy-star">
+              <polygon points="0,-14 4,-5 14,-5 7,2 10,12 0,7 -10,12 -7,2 -14,-5 -4,-5"
+                       fill="#69f0ae" stroke="#00695c" stroke-width="1.5"/>
             </g>
           </g>
         </g>
 
-        <!-- BANG starburst -->
-        <g class="bang-burst" transform="translate(290, 60)">
-          <!-- Starburst shape -->
-          <polygon points="60,0 72,45 115,30 85,65 120,80 75,85 90,130 55,100 40,140 35,95 -10,105 20,70 -15,45 30,50 15,5 55,35" fill="#FFD700" stroke="#e65100" stroke-width="3"/>
-          <polygon points="60,10 68,42 105,30 82,60 112,75 72,79 85,120 54,96 42,130 38,89 -3,98 23,67 -8,45 28,49 16,12 53,38" fill="#FF5722" opacity="0.5"/>
-          <text x="60" y="75" text-anchor="middle" font-size="26" font-weight="bold" fill="#fff" font-family="Arial Black" stroke="#e65100" stroke-width="2">BANG!</text>
+        <!-- ═══════════════════════════════════════════════════
+             BANG starburst — center of the screen, mid-height
+             ═══════════════════════════════════════════════════ -->
+        <g class="bang-burst" transform="translate(230,62)">
+          <!-- Outer yellow burst -->
+          <polygon points="70,0 84,52 134,35 100,75 138,95 88,100 105,150 64,116 46,162 40,108 -10,122 24,80 -16,52 34,56 18,5 62,42"
+                   fill="#FFD700" stroke="#e65100" stroke-width="3"/>
+          <!-- Inner orange layer -->
+          <polygon points="70,10 80,48 122,34 96,70 130,88 86,92 100,138 62,110 48,148 44,100  0,112 26,74  -8,50 32,54 20,10 62,44"
+                   fill="#FF5722" opacity="0.55"/>
+          <!-- White inner core -->
+          <ellipse cx="70" cy="82" rx="36" ry="30" fill="#fff" opacity="0.8"/>
+          <!-- BANG text -->
+          <text x="70" y="92" text-anchor="middle" font-size="30" font-weight="bold"
+                fill="#e65100" font-family="Arial Black,Impact,sans-serif"
+                stroke="#fff" stroke-width="3" paint-order="stroke">BANG!</text>
         </g>
 
-        <!-- Speech bubble BONK -->
-        <g class="speech-bubble-bonk" transform="translate(380, 200)">
-          <ellipse cx="60" cy="30" rx="58" ry="26" fill="#fff" stroke="#333" stroke-width="3"/>
-          <polygon points="30,56 15,75 45,56" fill="#fff" stroke="#333" stroke-width="3"/>
-          <text x="60" y="37" text-anchor="middle" font-size="18" font-weight="bold" fill="#e65100" font-family="Arial Black">BONK!</text>
+        <!-- Speech bubble (appears near Kid B) -->
+        <g class="speech-bubble-bonk" transform="translate(390,215)">
+          <ellipse cx="62" cy="30" rx="66" ry="28" fill="#fff" stroke="#e65100" stroke-width="3"/>
+          <polygon points="28,56 10,80 52,56" fill="#fff" stroke="#e65100" stroke-width="2.5"/>
+          <text x="62" y="38" text-anchor="middle" font-size="22" font-weight="bold"
+                fill="#e65100" font-family="Arial Black,Impact,sans-serif">BONK!</text>
         </g>
       </svg>
     </div>
